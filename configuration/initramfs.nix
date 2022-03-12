@@ -185,13 +185,39 @@ in
           printf '\e[2K\r%s' "$@" > /dev/tty0 
         }
 
+        inquiry_string_for() {
+          printf "%-8.8s%-16.16s%-4.4s" "$@"
+        }
+
         device_serial() {
           if [ -e /sys/firmware/devicetree/base/serial-number ]; then
             cat /sys/firmware/devicetree/base/serial-number
-          elif [ -e /sys/class/dmi/id/board_serial ]; then
-            cat /sys/class/dmi/id/board_serial
+          elif [ -e /sys/class/dmi/id/product_serial ]; then
+            cat /sys/class/dmi/id/product_serial
           else
             echo "00000000"
+          fi
+        }
+
+        device_vendor() {
+          local vendor
+          if [ -e /proc/device-tree/compatible ]; then
+            vendor=$(cat /proc/device-tree/compatible)
+            echo "''${vendor%%,*}"
+          elif [ -e /sys/class/dmi/id/sys_vendor ]; then
+            cat /sys/class/dmi/id/sys_vendor
+          else
+            echo "Unknown"
+          fi
+        }
+
+        device_name() {
+          if [ -e /proc/device-tree/model ]; then
+            cat /proc/device-tree/model
+          elif [ -e /sys/class/dmi/id/product_name ]; then
+            cat /sys/class/dmi/id/product_name
+          else
+            echo "Unidentified device"
           fi
         }
 
@@ -214,8 +240,8 @@ in
         echo 0x0069 > g1/idProduct 
         echo 0x1209 > g1/idVendor 
         device_serial > g1/strings/0x409/serialnumber 
-        echo "celun"  > g1/strings/0x409/manufacturer 
-        echo "Device Name (Target Disk Mode)" > g1/strings/0x409/product 
+        echo "$(device_vendor)"  > g1/strings/0x409/manufacturer 
+        echo "$(device_name) (Target Disk Mode)" > g1/strings/0x409/product 
 
         pr_info " :: Adding functions to gadget..."
 
@@ -230,8 +256,8 @@ in
         # Vendor (8 chars), product (16 chars), release (4 hexadecimal digits)
         #     1234567812345678901234561234
         #     vvvvvvvvppppppppppppppppdddd
-        echo "celun   Device Name     mmc1" > g1/functions/mass_storage.0/lun.0/inquiry_string 
-        echo "celun   Device Name     mmc2" > g1/functions/mass_storage.0/lun.1/inquiry_string 
+        inquiry_string_for "$(device_vendor)" "$(device_name)" "mmc1" > g1/functions/mass_storage.0/lun.0/inquiry_string 
+        inquiry_string_for "$(device_vendor)" "$(device_name)" "mmc2" > g1/functions/mass_storage.0/lun.1/inquiry_string 
 
         # Add configuration and link functions
 
