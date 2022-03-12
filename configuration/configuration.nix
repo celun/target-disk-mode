@@ -45,6 +45,7 @@
       vt = true;
       graphics = true;
     };
+    logo = ./target-disk-mode.png;
   };
 
   wip.stage-1.compression = lib.mkDefault "xz";
