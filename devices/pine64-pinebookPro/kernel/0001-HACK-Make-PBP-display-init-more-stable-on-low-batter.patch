@@ -1,0 +1,30 @@
+From cd3a05dded8fcc9d2bd59c1af262afa9b7976d19 Mon Sep 17 00:00:00 2001
+From: Samuel Dionne-Riel <samuel@dionne-riel.com>
+Date: Sat, 23 Oct 2021 23:34:10 -0400
+Subject: [PATCH] [HACK] Make PBP display init more stable on low battery
+ voltage
+
+---
+ drivers/regulator/core.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/regulator/core.c b/drivers/regulator/core.c
+index ca6caba8a191a..750b538858d62 100644
+--- a/drivers/regulator/core.c
++++ b/drivers/regulator/core.c
+@@ -1525,12 +1525,6 @@ static int set_machine_constraints(struct regulator_dev *rdev)
+ 	 * and we have control then make sure it is enabled.
+ 	 */
+ 	if (rdev->constraints->always_on || rdev->constraints->boot_on) {
+-		/* If we want to enable this regulator, make sure that we know
+-		 * the supplying regulator.
+-		 */
+-		if (rdev->supply_name && !rdev->supply)
+-			return -EPROBE_DEFER;
+-
+ 		if (rdev->supply) {
+ 			ret = regulator_enable(rdev->supply);
+ 			if (ret < 0) {
+-- 
+2.33.0
+
