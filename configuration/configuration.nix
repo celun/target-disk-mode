@@ -29,6 +29,9 @@
 
       # TODO: "USB gadget" feature
       USB_GADGET = yes;
+      USB_CONFIGFS = yes;
+      USB_CONFIGFS_F_FS = yes;
+      USB_CONFIGFS_MASS_STORAGE = yes;
       # Otherwise gadget battery may unexpectedly drain.
       # The default is `2`.
       USB_GADGET_VBUS_DRAW = freeform "500";
