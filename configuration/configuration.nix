@@ -40,6 +40,15 @@
       MODULES = no;
       CC_OPTIMIZE_FOR_PERFORMANCE = no;
       CC_OPTIMIZE_FOR_SIZE = yes;
+
+      # -----
+
+      # 1000 Hz is the preferred choice for desktop systems and other
+      # systems requiring fast interactive responses to events.
+      HZ = freeform "1000";
+      HZ_1000 = yes;
+
+      SMP = yes;
     };
     features = {
       logo = true;
