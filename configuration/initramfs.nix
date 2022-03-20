@@ -221,6 +221,42 @@ in
           fi
         }
 
+        mass_storage_lun_number=0
+        mass_storage_add_lun() {
+          local blockdev
+          blockdev="$1"; shift
+
+          if [ -e "$blockdev" ]; then
+            # "Friendly" name (four chars)
+            local blockname
+            blockname="''${blockdev##*/}"         # Strips prefix
+            blockname="''${blockname/mmcblk/mmc}" # mmcblk1 → mmc1 (four chars)
+            blockname="''${blockname/nvme/nvm}"   # nvme0   → nvm0 (four chars)
+
+            local path
+            path=g1/functions/mass_storage.0
+
+            local number
+            number=$(( mass_storage_lun_number ))
+
+            path="$path/lun.$number"
+
+            # Add the LUN
+            mkdir -p "$path"
+
+            # Attach the block device to the LUN
+            # || :  so it doesn't fail the whole script on non-existent block device.
+            # It's possible there is no SD card!
+            echo "$blockdev" > $path/file || :
+
+            # Add a description to the LUN
+            inquiry_string_for "$(device_vendor)" "$(device_name)" \
+              "$blockname" > $path/inquiry_string 
+
+            mass_storage_lun_number=$(( mass_storage_lun_number + 1 ))
+          fi
+        }
+
         move_to_line 999
 
         pr_info "... initializing"
@@ -245,19 +281,16 @@ in
 
         pr_info " :: Adding functions to gadget..."
 
-        mkdir -p g1/functions/mass_storage.0/lun.0
-        mkdir -p g1/functions/mass_storage.0/lun.1
-
-        # || :  so it doesn't fail the whole script on non-existent block device.
-        # It's possible there is no SD card!
-        echo /dev/mmcblk1 > g1/functions/mass_storage.0/lun.0/file || :
-        echo /dev/mmcblk2 > g1/functions/mass_storage.0/lun.1/file || :
-
-        # Vendor (8 chars), product (16 chars), release (4 hexadecimal digits)
-        #     1234567812345678901234561234
-        #     vvvvvvvvppppppppppppppppdddd
-        inquiry_string_for "$(device_vendor)" "$(device_name)" "mmc1" > g1/functions/mass_storage.0/lun.0/inquiry_string 
-        inquiry_string_for "$(device_vendor)" "$(device_name)" "mmc2" > g1/functions/mass_storage.0/lun.1/inquiry_string 
+        # Note: Busybox ash doesn't have {0..9} to make a single `for d in /dev/{mmcblk,nvme}{0..9};`
+        for d in $(seq 0 9); do
+          mass_storage_add_lun "/dev/nvme$d"
+        done
+        for d in $(seq 0 9); do
+          mass_storage_add_lun "/dev/mmcblk$d"
+        done
+        for d in a b c d e f g; do
+          mass_storage_add_lun "/dev/sd$d"
+        done
 
         # Add configuration and link functions
 
