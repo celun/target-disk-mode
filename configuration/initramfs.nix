@@ -74,7 +74,6 @@ in
         # Launch all setup tasks
         ::sysinit:${extraUtils}/bin/sh -l -c ${extraUtils}/bin/mount-basic-mounts
         ::sysinit:${extraUtils}/bin/sh -l -c ${extraUtils}/bin/network-setup
-        ::sysinit:${extraUtils}/bin/sh -l -c ${extraUtils}/bin/logging-setup
         ::wait:${extraUtils}/bin/sh -l -c ${extraUtils}/bin/backlight-setup
         ::wait:${extraUtils}/bin/sh -l -c ${extraUtils}/bin/tdm-setup
 
@@ -148,18 +147,6 @@ in
         set -x
         hostname celun-TDM
         ip link set lo up
-      '')
-
-      (writeScriptBin "logging-setup" ''
-        #!/bin/sh
-
-        if [ -e /proc/sys/kernel/printk ]; then
-          (
-            PS4=" $ "
-            set -x
-            echo 5 > /proc/sys/kernel/printk
-          )
-        fi
       '')
 
       (writeScriptBin "backlight-setup" ''
