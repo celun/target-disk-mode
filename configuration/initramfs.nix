@@ -133,7 +133,7 @@ in
         #!/bin/sh
 
         PS4=" $ "
-        set -x
+        #set -x
         mkdir -p /proc /sys /dev /run /tmp
         mount -t proc proc /proc
         mount -t sysfs sys /sys
@@ -144,7 +144,7 @@ in
         #!/bin/sh
 
         PS4=" $ "
-        set -x
+        #set -x
         hostname celun-TDM
         ip link set lo up
       '')
@@ -162,7 +162,7 @@ in
 
         set -e
         PS4=" $ "
-        set -x
+        #set -x
 
         move_to_line() {
           printf '\e[%d;0H' "$@" > /dev/tty0
