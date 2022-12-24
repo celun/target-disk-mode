@@ -270,7 +270,7 @@ in
 
         # Note: Busybox ash doesn't have {0..9} to make a single `for d in /dev/{mmcblk,nvme}{0..9};`
         for d in $(seq 0 9); do
-          mass_storage_add_lun "/dev/nvme$d"
+          mass_storage_add_lun "/dev/nvme''${d}n1"
         done
         for d in $(seq 0 9); do
           mass_storage_add_lun "/dev/mmcblk$d"
