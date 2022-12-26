@@ -1,6 +1,6 @@
 let
-  rev = "31bf043c671a84a15c1dc4a1279a37af8244ddd3";
-  sha256 = "073nw744m5h3rc0yzvyyx9vv061wrkkvad7vhywn78hvic4i849h";
+  rev = "9167f946b6ea75144cef3bfcc2cb18edf502408d";
+  sha256 = "0wxb8wkn2fwmbw1grj2yaav3di7471rk879zd3va5wm61dqzddmm";
 in
 builtins.fetchTarball {
   url = "https://github.com/celun/celun/archive/${rev}.tar.gz";
